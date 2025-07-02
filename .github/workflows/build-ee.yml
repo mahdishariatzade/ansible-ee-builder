@@ -22,8 +22,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Install ansible-builder
-        run: pip install ansible-builder
+      - name: Install ansible-dev-tools
+        run: pip install ansible-dev-tools
       - name: Build the Execution Environment
         id: build
         run: |
