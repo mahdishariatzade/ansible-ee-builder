@@ -1,0 +1,36 @@
+# Python requirements for Ansible Execution Environment
+# Core Ansible dependencies
+ansible-core>=2.14.0
+ansible-runner>=2.3.0
+
+# HTTP/API libraries
+requests>=2.28.0
+urllib3>=1.26.0
+
+# Cloud and infrastructure
+boto3>=1.26.0
+botocore>=1.29.0
+google-auth>=2.16.0
+azure-mgmt-core>=1.4.0
+kubernetes>=25.0.0
+
+# Network automation
+netaddr>=0.8.0
+textfsm>=1.1.0
+ntc-templates>=3.0.0
+jinja2>=3.1.0
+
+# System utilities
+psutil>=5.9.0
+PyYAML>=6.0
+
+# Security and encryption
+cryptography>=3.4.8
+paramiko>=2.12.0
+
+# Database connectivity
+psycopg2-binary>=2.9.0
+PyMySQL>=1.0.0
+
+# Monitoring and observability
+jsonschema>=4.17.0 

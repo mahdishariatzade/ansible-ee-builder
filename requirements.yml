@@ -1,0 +1,71 @@
+---
+# Ansible Galaxy requirements file
+# Collections required for the Execution Environment
+
+collections:
+  # Core community collections
+  - name: community.general
+    version: '>=7.0.0'
+
+  - name: community.docker
+    version: '>=3.4.0'
+
+  - name: community.crypto
+    version: '>=2.10.0'
+
+  - name: community.postgresql
+    version: '>=2.3.0'
+
+  - name: community.mysql
+    version: '>=3.5.0'
+
+  # Cloud providers
+  - name: amazon.aws
+    version: '>=6.0.0'
+
+  - name: azure.azcollection
+    version: '>=1.15.0'
+
+  - name: google.cloud
+    version: '>=1.1.0'
+
+  - name: kubernetes.core
+    version: '>=2.4.0'
+
+  # Network automation
+  - name: cisco.ios
+    version: '>=4.6.0'
+
+  - name: cisco.iosxr
+    version: '>=5.0.0'
+
+  - name: cisco.nxos
+    version: '>=4.4.0'
+
+  - name: arista.eos
+    version: '>=6.0.0'
+
+  - name: junipernetworks.junos
+    version: '>=5.3.0'
+
+  # Ansible utilities
+  - name: ansible.posix
+    version: '>=1.5.0'
+
+  - name: ansible.utils
+    version: '>=2.9.0'
+
+  - name: ansible.netcommon
+    version: '>=5.1.0'
+
+  # Security
+  - name: community.hashi_vault
+    version: '>=5.0.0'
+
+  # Monitoring
+  - name: community.grafana
+    version: '>=1.5.0'
+# Optional: Include roles if needed
+# roles:
+#   - name: geerlingguy.docker
+#     version: "6.1.0"

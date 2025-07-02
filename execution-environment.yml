@@ -1,22 +1,56 @@
 version: 3
 images:
   base_image:
-    name: quay.io/ansible/awx-ee:latest
+    name: 'quay.io/ansible/awx-ee:latest'
+
 dependencies:
-  python_interpreter:
-    package_system: python3
-  ansible_core:
-    package_pip: ansible-core
-  ansible_runner:
-    package_pip: ansible-runner
-  system:
-    - openssh-clients
-    - sshpass
-    - libxml2-devel
-  galaxy:
-    collections:
-      - community.docker
+  # System dependencies via bindep
+  system: bindep.txt
+
+  # Python dependencies
+  python: requirements.txt
+
+  # Ansible collections and roles
+  galaxy: requirements.yml
 
 additional_build_steps:
   prepend_base:
-    - RUN dnf install -y gcc python3-devel libxml2-devel libxslt-devel openssl-devel libffi-devel && dnf clean all
+    # Update package manager and install essential tools
+    - RUN dnf makecache --refresh
+    - RUN dnf install -y \
+      gcc \
+      python3-devel \
+      libxml2-devel \
+      libxslt-devel \
+      openssl-devel \
+      libffi-devel \
+      git \
+      curl \
+      wget \
+      jq \
+      && dnf clean all \
+      && rm -rf /var/cache/dnf
+
+    # Create non-root user for better security
+    - RUN groupadd -g 1000 ansible && \
+      useradd -u 1000 -g ansible -m -s /bin/bash ansible
+
+  append_final:
+    # Set proper permissions and cleanup
+    - RUN chmod -R g+w /opt/ansible-navigator \
+      && chgrp -R 0 /opt/ansible-navigator
+
+    # Create directories for runtime
+    - RUN mkdir -p /tmp/ansible-tmp \
+      && chmod 1777 /tmp/ansible-tmp
+
+    # Set timezone
+    - RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
+
+    # Final cleanup
+    - RUN dnf clean all \
+      && rm -rf /var/cache/dnf \
+      && rm -rf /tmp/* \
+      && rm -rf /var/tmp/*
+# Note: Labels and user settings should be handled in the GitHub Actions workflow
+# when building and pushing the container image
