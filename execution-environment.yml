@@ -12,10 +12,11 @@ dependencies:
   system:
     - openssh-clients
     - sshpass
+    - libxml2-devel
   galaxy:
     collections:
       - community.docker
 
 additional_build_steps:
   prepend_base:
-    - RUN dnf install -y gcc python3-devel && dnf clean all
+    - RUN dnf install -y gcc python3-devel libxml2-devel libxslt-devel openssl-devel libffi-devel && dnf clean all
