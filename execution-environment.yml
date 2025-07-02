@@ -17,5 +17,5 @@ dependencies:
       - community.docker
 
 additional_build_steps:
-  prepend_galaxy:
+  prepend_base:
     - RUN dnf install -y gcc python3-devel && dnf clean all
