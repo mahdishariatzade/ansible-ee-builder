@@ -1,0 +1,34 @@
+name: Build and Push EE Image
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Log in to the GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install ansible-builder
+        run: pip install ansible-builder
+      - name: Build the Execution Environment
+        id: build
+        run: |
+          ansible-builder build --tag ghcr.io/${{ github.repository }}:latest --context .
+          echo "image=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
+      - name: Push the image to GitHub Container Registry
+        run: |
+          docker push ${{ steps.build.outputs.image }}
