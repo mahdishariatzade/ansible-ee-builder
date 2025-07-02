@@ -1,27 +1,7 @@
 # System dependencies for Ansible Execution Environment
-# Package names for different OS distributions
+# Essential packages only - dev packages are handled during build if needed
 
-# Essential build tools
-gcc [compile]
-python3-dev [compile]
-python3-devel [compile platform:centos-8 platform:rhel-8 platform:fedora]
-make [compile]
-
-# SSL/TLS support
-openssl-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-libssl-dev [platform:dpkg]
-
-# XML processing
-libxml2-dev [platform:dpkg]
-libxml2-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-libxslt-dev [platform:dpkg]
-libxslt-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-
-# Foreign Function Interface
-libffi-dev [platform:dpkg]
-libffi-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-
-# SSH clients and utilities
+# SSH clients and utilities (most important for Ansible)
 openssh-clients [platform:centos-8 platform:rhel-8 platform:fedora]
 openssh-client [platform:dpkg]
 sshpass
@@ -34,26 +14,20 @@ curl
 wget
 rsync
 
-# Database client libraries
-postgresql-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-libpq-dev [platform:dpkg]
-mysql-devel [platform:centos-8 platform:rhel-8 platform:fedora]
-libmysqlclient-dev [platform:dpkg]
-
 # Compression utilities
 unzip
 tar
 gzip
 
-# System monitoring and process management
-procps-ng [platform:centos-8 platform:rhel-8 platform:fedora]
-procps [platform:dpkg]
-
-# Timezone data
-tzdata
+# JSON processing
+jq
 
 # Certificate management
 ca-certificates
 
-# Additional utilities for cloud operations
-jq 
+# Timezone data
+tzdata
+
+# Process management utilities
+procps-ng [platform:centos-8 platform:rhel-8 platform:fedora]
+procps [platform:dpkg] 
