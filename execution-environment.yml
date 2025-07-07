@@ -15,6 +15,7 @@ dependencies:
     - gcc
     - python3-devel
     - libffi-devel
+    - libxml2-devel
     - openssl-devel
     - krb5-devel
     - make
