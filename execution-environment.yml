@@ -12,7 +12,13 @@ dependencies:
   ansible_runner:
     package_pip: ansible-runner
   system:
-    []
+    - gcc
+    - python3-devel
+    - libffi-devel
+    - openssl-devel
+    - krb5-devel
+    - make
+    - git
     # - openssh-clients
     # - sshpass
   galaxy:
