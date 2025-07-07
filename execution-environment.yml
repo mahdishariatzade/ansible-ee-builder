@@ -25,3 +25,4 @@ dependencies:
   galaxy:
     collections:
       - name: community.general
+      - name: community.docker
