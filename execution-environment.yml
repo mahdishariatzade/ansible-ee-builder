@@ -26,3 +26,12 @@ dependencies:
     collections:
       - name: community.general
       - name: community.docker
+
+
+
+additional_build_files:
+    - src: files/ansible.cfg
+      dest: configs
+additional_build_steps:
+  prepend_galaxy:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
