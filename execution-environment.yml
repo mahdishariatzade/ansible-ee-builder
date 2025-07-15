@@ -26,3 +26,5 @@ dependencies:
     collections:
       - name: community.general
       - name: community.docker
+      - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
+
