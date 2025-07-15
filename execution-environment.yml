@@ -26,12 +26,11 @@ dependencies:
     collections:
       - name: community.general
       - name: community.docker
-
-
+      - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
 
 additional_build_files:
-    - src: files/ansible.cfg
-      dest: configs
+  - src: files/ansible.cfg
+    dest: configs
 additional_build_steps:
   prepend_galaxy:
     - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
