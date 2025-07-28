@@ -22,11 +22,15 @@ dependencies:
     - git
     # - openssh-clients
     # - sshpass
+  python:
+    - boto3>=1.26.0
+    - botocore>=1.29.0
   galaxy:
     collections:
       - name: community.general
       - name: community.docker
       - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
+      - name: amazon.aws
 
 additional_build_files:
   - src: files/ansible.cfg
