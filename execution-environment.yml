@@ -31,6 +31,7 @@ dependencies:
       - name: community.docker
       - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
       - name: amazon.aws
+      - name: mahdishariatzade.shared_tasks
 
 additional_build_files:
   - src: files/ansible.cfg
