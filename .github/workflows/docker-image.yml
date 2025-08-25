@@ -3,6 +3,7 @@ name: build-ee
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 # This workflow builds an Ansible Execution Environment image using ansible-builder
 # and publishes it to GitHub Container Registry (GHCR).
