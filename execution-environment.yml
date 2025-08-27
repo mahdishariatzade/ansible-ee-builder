@@ -39,8 +39,9 @@ additional_build_files:
     dest: configs
 additional_build_steps:
   prepend_base:
-    - RUN curl -o /etc/yum.repos.d/pgdg.repo https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
-    - RUN dnf install -y --disablerepo="*" --enablerepo="pgdg*" postgresql
+    - RUN dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    - RUN dnf -y module disable postgresql
+    - RUN dnf install -y --disablerepo="*" --enablerepo="pgdg17" postgresql17
     - RUN dnf clean all && rm -rf /var/cache/dnf
   prepend_galaxy:
     - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
