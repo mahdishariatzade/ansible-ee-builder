@@ -25,6 +25,7 @@ dependencies:
   python:
     - boto3>=1.26.0
     - botocore>=1.29.0
+    - psycopg2-binary
   galaxy:
     collections:
       - name: community.general
@@ -37,5 +38,9 @@ additional_build_files:
   - src: files/ansible.cfg
     dest: configs
 additional_build_steps:
+  prepend_base:
+    - RUN curl -o /etc/yum.repos.d/pgdg.repo https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    - RUN dnf install -y --disablerepo="*" --enablerepo="pgdg*" postgresql
+    - RUN dnf clean all && rm -rf /var/cache/dnf
   prepend_galaxy:
     - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
