@@ -1,0 +1,133 @@
+version: 3
+
+images:
+  base_image:
+    name: quay.io/centos/centos:stream9
+
+dependencies:
+  python_interpreter:
+    package_system: python3
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
+  system:
+    - gcc
+    - python3-devel
+    - libffi-devel
+    - libxml2-devel
+    - openssl-devel
+    - krb5-devel
+    - make
+    - git
+    - sudo
+    - acl
+    # - openssh-clients
+    # - sshpass
+  python:
+    - boto3>=1.26.0
+    - botocore>=1.29.0
+    - psycopg2-binary
+  galaxy:
+    collections:
+      - name: community.general
+      - name: community.docker
+      - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
+      - name: amazon.aws
+      - name: mahdishariatzade.shared_tasks
+
+additional_build_files:
+  - src: files/ansible.cfg
+    dest: configs
+additional_build_steps:
+  prepend_base:
+    # install git first (required for galaxy collections installation)
+    - "RUN /usr/bin/dnf install -y git && \
+      /usr/bin/dnf clean all"
+
+    # install postgresql 17
+    - "RUN /usr/bin/dnf -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm && \
+      /usr/bin/dnf -y module disable postgresql && \
+      /usr/bin/dnf install -y --enablerepo=\"pgdg17\" postgresql17 && \
+      /usr/bin/dnf clean all && rm -rf /var/cache/dnf"
+
+    # swap curl-minimal curl
+    - "RUN /usr/bin/dnf -y swap curl-minimal curl && \
+      /usr/bin/dnf clean all"
+
+    # install kubectl using native package management
+    - |
+      RUN cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://pkgs.k8s.io/core:/stable:/v1.34/rpm/
+      enabled=1
+      gpgcheck=1
+      gpgkey=https://pkgs.k8s.io/core:/stable:/v1.34/rpm/repodata/repomd.xml.key
+      EOF
+    - "RUN /usr/bin/dnf install -y kubectl && \
+      /usr/bin/dnf clean all"
+
+  prepend_galaxy:
+    - COPY _build/configs/ansible.cfg /etc/ansible/ansible.cfg
+
+  append_final:
+    # install krew system-wide
+    - "RUN set -x && \
+      cd \"$(mktemp -d)\" && \
+      OS=\"$(uname | tr '[:upper:]' '[:lower:]')\" && \
+      ARCH=\"$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\\(arm\\)\\(64\\)\\?.*/\\1\\2/' -e 's/aarch64$/arm64/')\" && \
+      KREW=\"krew-${OS}_${ARCH}\" && \
+      curl -fsSLO \"https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz\" && \
+      tar zxvf \"${KREW}.tar.gz\" && \
+      mkdir -p /usr/local/krew && \
+      HOME=/usr/local/krew ./\"${KREW}\" install krew && \
+      rm -f \"${KREW}\" \"${KREW}.tar.gz\" && \
+      mkdir -p /usr/local/krew/bin && \
+      cp -r /usr/local/krew/.krew/bin/* /usr/local/krew/bin/ 2>/dev/null || true && \
+      chmod -R a+rx /usr/local/krew/bin && \
+      chmod -R a+rx /usr/local/krew/.krew && \
+      export PATH=\"/usr/local/krew/bin:$PATH\" && \
+      kubectl krew version"
+
+    # set krew path permanently
+    - "ENV KREW_ROOT=/usr/local/krew/.krew"
+    - "ENV PATH=/usr/local/krew/bin:$PATH"
+
+    # install krew plugins
+    - "RUN kubectl krew install oidc-login && \
+      kubectl krew list | grep oidc-login && \
+      cp -r /usr/local/krew/.krew/bin/* /usr/local/krew/bin/ 2>/dev/null || true && \
+      chmod -R a+rx /usr/local/krew/bin && \
+      ls -la /usr/local/krew/bin/kubectl-oidc_login && \
+      /usr/local/krew/bin/kubectl-oidc_login --version || echo 'Plugin installed successfully'"
+
+    # ensure PATH is set system-wide for all shells and non-shell processes
+    - "RUN echo 'export PATH=/usr/local/krew/bin:$PATH' >> /etc/profile.d/krew.sh && \
+      echo 'export KREW_ROOT=/usr/local/krew/.krew' >> /etc/profile.d/krew.sh && \
+      chmod +x /etc/profile.d/krew.sh && \
+      echo 'PATH=/usr/local/krew/bin:$PATH' >> /etc/environment && \
+      echo 'export PATH=/usr/local/krew/bin:$PATH' >> /etc/bashrc && \
+      echo 'export PATH=/usr/local/krew/bin:$PATH' >> /etc/profile && \
+      echo 'export PATH=/usr/local/krew/bin:$PATH' >> /etc/bash.bashrc && \
+      echo 'export PATH=/usr/local/krew/bin:$PATH' >> /root/.bashrc && \
+      echo 'export PATH=/usr/local/krew/bin:$PATH' >> /root/.bash_profile"
+
+    # configure passwordless sudo for all users
+    - "RUN echo 'runner ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/passwordless && \
+      echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/passwordless && \
+      echo 'ALL ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/passwordless && \
+      chmod 0440 /etc/sudoers.d/passwordless"
+
+    # enable passwordless root access for su (set empty password for root)
+    - "RUN usermod -p '' root 2>/dev/null || passwd -d root 2>/dev/null || echo 'Root password already disabled'"
+
+    # disable PAM for sudo in containers (PAM doesn't work properly in containers)
+    # Also configure sudo.conf to bypass PAM authentication
+    - "RUN echo 'Defaults !requiretty' > /etc/sudoers.d/no-tty && \
+      echo 'Defaults !pam_session' >> /etc/sudoers.d/no-tty && \
+      chmod 0440 /etc/sudoers.d/no-tty && \
+      if [ -f /etc/sudo.conf ]; then \
+      sed -i '/^#/!{/Plugin.*pam/ s/^/#/}' /etc/sudo.conf 2>/dev/null || true; \
+      fi && \
+      visudo -c"
