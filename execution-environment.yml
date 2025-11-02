@@ -22,6 +22,7 @@ dependencies:
     - git
     - sudo
     - acl
+    - which
     # - openssh-clients
     # - sshpass
   python:
