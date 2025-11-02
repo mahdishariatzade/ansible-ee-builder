@@ -23,6 +23,7 @@ dependencies:
     - sudo
     - acl
     - which
+    - unzip
     # - openssh-clients
     # - sshpass
   python:
