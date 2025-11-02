@@ -134,3 +134,11 @@ additional_build_steps:
       sed -i '/^#/!{/Plugin.*pam/ s/^/#/}' /etc/sudo.conf 2>/dev/null || true; \
       fi && \
       visudo -c"
+
+    # install aws cli
+    - "RUN if ! command -v aws &> /dev/null; then \
+      curl -fsSL https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -o /tmp/awscliv2.zip && \
+      unzip -q /tmp/awscliv2.zip -d /tmp && \
+      /tmp/aws/install -i /usr/local/aws-cli -b /usr/local/bin && \
+      rm -rf /tmp/awscliv2.zip /tmp/aws; \
+      fi"
