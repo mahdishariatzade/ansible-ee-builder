@@ -32,6 +32,7 @@ dependencies:
     collections:
       - name: community.general
       - name: community.docker
+      - name: kubernetes.core
       - name: git+https://github.com/arvancloud/ar-iaas-ansible.git
       - name: amazon.aws
       - name: mahdishariatzade.shared_tasks
