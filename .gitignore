@@ -1,1 +1,7 @@
 context
+
+
+play.yml
+ansible-navigator.log
+play-artifact-*.json
+.ansible
